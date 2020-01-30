@@ -3,12 +3,17 @@ import axios from 'axios';
 import styled from 'styled-components';
 
 const WeatherContainer = () => {
+  const [degreeUnit, setDegreeUnit] = useState(false);
+
   const [info, setInfo] = useState({
     city: '',
-    temp: '',
-    feelsLike: '',
     desc: '',
     country: ''
+  });
+
+  const [temp, setTemp] = useState({
+    liveTemp: '',
+    feelsLike: ''
   });
 
   function getData() {
@@ -28,22 +33,56 @@ const WeatherContainer = () => {
   function showOutput(res) {
     setInfo({
       city: res.name,
-      temp: res.main.temp,
-      feelsLike: res.main.feels_like,
       desc: res.weather[0].main,
       country: res.sys.country
     });
+
+    let convertedLiveTemp = convertKelvin(res.main.temp);
+    let convertedFeelsLike = convertKelvin(res.main.feels_like);
+
+    setTemp({
+      liveTemp: convertedLiveTemp,
+      feelsLike: convertedFeelsLike
+    });
+  }
+
+  function changeDegreeUnit() {
+    if (degreeUnit === false) {
+      setDegreeUnit(true);
+    } else {
+      setDegreeUnit(false);
+    }
+  }
+
+  function convertKelvin(degrees) {
+    let convertedTemp;
+    if (degreeUnit === false) {
+      convertedTemp = degrees - 273.15;
+      return Math.round(convertedTemp);
+    } else {
+      convertedTemp = (degrees - 273.15) * (9 / 5) + 32;
+      return Math.round(convertedTemp);
+    }
   }
 
   return (
     <div>
       <button onClick={getData}>Button</button>
-      <h2>{info.temp}&#176;</h2>
+      <h2>{temp.liveTemp}&#176;</h2>
       <p>{info.desc}</p>
-      <p>{info.feelsLike}</p>
+      <p>{temp.feelsLike}</p>
       <p>
         {info.city} {info.country}
       </p>
+      <div>
+        <input
+          type='checkbox'
+          name='toggleSwitch'
+          className='toggle-switch'
+          onClick={changeDegreeUnit}
+        />
+        <label htmlFor='toggleSwitch'>&#176;F</label>
+      </div>
 
       <ul>
         <li>
