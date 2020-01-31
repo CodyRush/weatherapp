@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
+import Info from './Info';
+
 import axios from 'axios';
 import styled from 'styled-components';
 
 // STYLE
 const Container = styled.div`
-  width: 60%;
+  width: 30%;
   margin: 5rem auto;
-`;
-
-const Info = styled.div`
-  background: #6294ed;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
+  font-family: 'Lato', sans-serif;
 `;
 
 const SearchContainer = styled.div`
@@ -43,10 +37,17 @@ const Submit = styled.button`
   cursor: pointer;
 `;
 
+const Clear = styled(Submit)`
+  background: none;
+  border: 1px solid gray;
+  color: #333;
+`;
+
 const CelciusButton = styled.button`
   background: blue;
   color: white;
-  font-size: 1.5rem;
+  padding: 0.5rem;
+  font-size: 1.1rem;
   border: none;
 `;
 
@@ -57,6 +58,7 @@ const FarhenButton = styled(CelciusButton)`
 const WeatherContainer = () => {
   const [searchString, setSearchString] = useState('');
   const [degreeUnit, setDegreeUnit] = useState(false);
+  const [dataFilled, setDataFilled] = useState(false);
 
   const [info, setInfo] = useState({
     city: '',
@@ -81,7 +83,7 @@ const WeatherContainer = () => {
       )
       .then(res => {
         showOutput(res.data);
-        console.log(res.data);
+        setDataFilled(true);
       })
       .catch(function(error) {
         console.log(error);
@@ -106,6 +108,27 @@ const WeatherContainer = () => {
     });
   }
 
+  function clearData() {
+    setInfo({
+      city: '',
+      desc: '',
+      country: ''
+    });
+
+    setTempC({
+      liveTemp: '',
+      feelsLike: ''
+    });
+
+    setTempF({
+      liveTemp: '',
+      feelsLike: ''
+    });
+
+    setDataFilled(false);
+    setSearchString('');
+  }
+
   function changeDegreeUnit() {
     if (degreeUnit === false) {
       setDegreeUnit(true);
@@ -125,8 +148,14 @@ const WeatherContainer = () => {
   return (
     <Container>
       <SearchContainer>
-        <SearchBar type='text' placeholder='City' onChange={handleChange} />
+        <SearchBar
+          type='text'
+          placeholder='City'
+          onChange={handleChange}
+          value={searchString}
+        />
         <Submit onClick={getData}>Submit</Submit>
+        <Clear onClick={clearData}>Clear</Clear>
         <div>
           {degreeUnit ? (
             <FarhenButton onClick={changeDegreeUnit}>F</FarhenButton>
@@ -135,16 +164,20 @@ const WeatherContainer = () => {
           )}
         </div>
       </SearchContainer>
-      <Info>
-        <h2>{degreeUnit ? tempF.liveTemp : tempC.liveTemp}&#176;</h2>
-        <p>{info.desc}</p>
-        <p>{degreeUnit ? tempF.feelsLike : tempC.feelsLike}</p>
-        <p>
-          {info.city} {info.country}
-        </p>
-      </Info>
+      <div>
+        {dataFilled ? (
+          <Info
+            degreeUnit={degreeUnit}
+            tempC={tempC}
+            tempF={tempF}
+            info={info}
+          />
+        ) : (
+          ''
+        )}
+      </div>
     </Container>
   );
 };
-
+//
 export default WeatherContainer;
