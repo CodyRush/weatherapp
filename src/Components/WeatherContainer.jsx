@@ -11,7 +11,12 @@ const WeatherContainer = () => {
     country: ''
   });
 
-  const [temp, setTemp] = useState({
+  const [tempC, setTempC] = useState({
+    liveTemp: '',
+    feelsLike: ''
+  });
+
+  const [tempF, setTempF] = useState({
     liveTemp: '',
     feelsLike: ''
   });
@@ -19,7 +24,7 @@ const WeatherContainer = () => {
   function getData() {
     return axios
       .get(
-        'https://api.openweathermap.org/data/2.5/weather?q=Edmonton&appid=ad009ed73a94496b7f9a281574c70ea4'
+        'https://api.openweathermap.org/data/2.5/weather?q=Edmonton&units=metric&appid=ad009ed73a94496b7f9a281574c70ea4'
       )
       .then(res => {
         showOutput(res.data);
@@ -37,12 +42,14 @@ const WeatherContainer = () => {
       country: res.sys.country
     });
 
-    let convertedLiveTemp = convertKelvin(res.main.temp);
-    let convertedFeelsLike = convertKelvin(res.main.feels_like);
+    setTempC({
+      liveTemp: Math.round(res.main.temp),
+      feelsLike: Math.round(res.main.feels_like)
+    });
 
-    setTemp({
-      liveTemp: convertedLiveTemp,
-      feelsLike: convertedFeelsLike
+    setTempF({
+      liveTemp: Math.round(convertC(res.main.temp)),
+      feelsLike: Math.round(convertC(res.main.feels_like))
     });
   }
 
@@ -54,23 +61,16 @@ const WeatherContainer = () => {
     }
   }
 
-  function convertKelvin(degrees) {
-    let convertedTemp;
-    if (degreeUnit === false) {
-      convertedTemp = degrees - 273.15;
-      return Math.round(convertedTemp);
-    } else {
-      convertedTemp = (degrees - 273.15) * (9 / 5) + 32;
-      return Math.round(convertedTemp);
-    }
+  function convertC(degrees) {
+    return degrees * (9 / 5) + 32;
   }
 
   return (
     <div>
       <button onClick={getData}>Button</button>
-      <h2>{temp.liveTemp}&#176;</h2>
+      <h2>{degreeUnit ? tempF.liveTemp : tempC.liveTemp}&#176;</h2>
       <p>{info.desc}</p>
-      <p>{temp.feelsLike}</p>
+      <p>{degreeUnit ? tempF.feelsLike : tempC.feelsLike}</p>
       <p>
         {info.city} {info.country}
       </p>
@@ -83,29 +83,6 @@ const WeatherContainer = () => {
         />
         <label htmlFor='toggleSwitch'>&#176;F</label>
       </div>
-
-      <ul>
-        <li>
-          <h3>Saturday</h3>
-          <img src='' alt='' />
-          <p>13&#176; - 7&#176;</p>
-        </li>
-        <li>
-          <h3>Saturday</h3>
-          <img src='' alt='' />
-          <p>13&#176; - 7&#176;</p>
-        </li>
-        <li>
-          <h3>Saturday</h3>
-          <img src='' alt='' />
-          <p>13&#176; - 7&#176;</p>
-        </li>
-        <li>
-          <h3>Saturday</h3>
-          <img src='' alt='' />
-          <p>13&#176; - 7&#176;</p>
-        </li>
-      </ul>
     </div>
   );
 };

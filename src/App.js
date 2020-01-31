@@ -1,9 +1,10 @@
 import React from 'react';
-import WeatherContainer from './Components/WeatherContainer.jsx';
+import 'minireset.css';
+import WeatherContainer from './Components/WeatherContainer';
 
 function App() {
   return (
-    <div className='app-container'>
+    <div className='App'>
       <WeatherContainer />
     </div>
   );
